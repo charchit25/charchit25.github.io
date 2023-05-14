@@ -1,68 +1,115 @@
 /* ===================================================================
- * Monica 1.0.0 - Main JS
+ * Ceevee 2.0.0 - Main JS
  *
  * ------------------------------------------------------------------- */
 
 (function(html) {
 
-    'use strict';
-
-    const cfg = {
-
-        // MailChimp URL
-        mailChimpURL : 'https://facebook.us1.list-manage.com/subscribe/post?u=1abf75f6981256963a47d197a&amp;id=37c6d8f4d6' 
-
-    };
+    "use strict";
+    
+    html.className = html.className.replace(/\bno-js\b/g, '') + ' js ';
 
 
-   /* preloader
+   /* Preloader
     * -------------------------------------------------- */
     const ssPreloader = function() {
 
-        const siteBody = document.querySelector('body');
         const preloader = document.querySelector('#preloader');
         if (!preloader) return;
 
-        html.classList.add('ss-preload');
-        
         window.addEventListener('load', function() {
-            html.classList.remove('ss-preload');
-            html.classList.add('ss-loaded');
             
-            preloader.addEventListener('transitionend', function afterTransition(e) {
-                if (e.target.matches('#preloader'))  {
-                    siteBody.classList.add('ss-show');
-                    e.target.style.display = 'none';
-                    preloader.removeEventListener(e.type, afterTransition);
+            document.querySelector('body').classList.remove('ss-preload');
+            document.querySelector('body').classList.add('ss-loaded');
+
+            preloader.addEventListener('transitionend', function(e) {
+                if (e.target.matches("#preloader")) {
+                    this.style.display = 'none';
                 }
             });
+
         });
+
+        // force page scroll position to top at page refresh
+        // window.addEventListener('beforeunload' , function () {
+        //     window.scrollTo(0, 0);
+        // });
 
     }; // end ssPreloader
 
 
-   /* mobile menu
+   /* Parallax
+    * -------------------------------------------------- */
+    const ssParallax = function() { 
+
+        const rellax = new Rellax('.rellax');
+
+    }; // end ssParallax
+
+
+   /* Move header menu
+    * -------------------------------------------------- */
+    const ssMoveHeader = function () {
+
+        const hdr = document.querySelector('.s-header');
+        const hero = document.querySelector('#hero');
+        let triggerHeight;
+
+        if (!(hdr && hero)) return;
+
+        setTimeout(function(){
+            triggerHeight = hero.offsetHeight - 170;
+        }, 300);
+
+        window.addEventListener('scroll', function () {
+
+            let loc = window.scrollY;
+           
+
+            if (loc > triggerHeight) {
+                hdr.classList.add('sticky');
+            } else {
+                hdr.classList.remove('sticky');
+            }
+
+            if (loc > triggerHeight + 20) {
+                hdr.classList.add('offset');
+            } else {
+                hdr.classList.remove('offset');
+            }
+
+            if (loc > triggerHeight + 150) {
+                hdr.classList.add('scrolling');
+            } else {
+                hdr.classList.remove('scrolling');
+            }
+
+        });
+
+    }; // end ssMoveHeader
+
+
+   /* Mobile Menu
     * ---------------------------------------------------- */ 
     const ssMobileMenu = function() {
 
         const toggleButton = document.querySelector('.s-header__menu-toggle');
-        const mainNavWrap = document.querySelector('.s-header__nav');
-        const siteBody = document.querySelector('body');
+        const headerNavWrap = document.querySelector('.s-header__nav-wrap');
+        const siteBody = document.querySelector("body");
 
-        if (!(toggleButton && mainNavWrap)) return;
+        if (!(toggleButton && headerNavWrap)) return;
 
-        toggleButton.addEventListener('click', function(e) {
-            e.preventDefault();
+        toggleButton.addEventListener('click', function(event){
+            event.preventDefault();
             toggleButton.classList.toggle('is-clicked');
             siteBody.classList.toggle('menu-is-open');
         });
 
-        mainNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
+        headerNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
+            link.addEventListener("click", function(evt) {
 
-            link.addEventListener("click", function(event) {
-
-                // at 900px and below
-                if (window.matchMedia('(max-width: 900px)').matches) {
+                // at 800px and below
+                if (window.matchMedia('(max-width: 800px)').matches) {
                     toggleButton.classList.toggle('is-clicked');
                     siteBody.classList.toggle('menu-is-open');
                 }
@@ -71,240 +118,162 @@
 
         window.addEventListener('resize', function() {
 
-            // above 900px
-            if (window.matchMedia('(min-width: 901px)').matches) {
+            // above 800px
+            if (window.matchMedia('(min-width: 801px)').matches) {
                 if (siteBody.classList.contains('menu-is-open')) siteBody.classList.remove('menu-is-open');
-                if (toggleButton.classList.contains('is-clicked')) toggleButton.classList.remove('is-clicked');
+                if (toggleButton.classList.contains("is-clicked")) toggleButton.classList.remove("is-clicked");
             }
         });
 
     }; // end ssMobileMenu
 
 
-   /* swiper
+   /* Highlight active menu link on pagescroll
+    * ------------------------------------------------------ */
+    const ssScrollSpy = function() {
+
+        const sections = document.querySelectorAll(".target-section");
+
+        // Add an event listener listening for scroll
+        window.addEventListener("scroll", navHighlight);
+
+        function navHighlight() {
+        
+            // Get current scroll position
+            let scrollY = window.pageYOffset;
+        
+            // Loop through sections to get height(including padding and border), 
+            // top and ID values for each
+            sections.forEach(function(current) {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 50;
+                const sectionId = current.getAttribute("id");
+            
+               /* If our current scroll position enters the space where current section 
+                * on screen is, add .current class to parent element(li) of the thecorresponding 
+                * navigation link, else remove it. To know which link is active, we use 
+                * sectionId variable we are getting while looping through sections as 
+                * an selector
+                */
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelector(".s-header__nav a[href*=" + sectionId + "]").parentNode.classList.add("current");
+                } else {
+                    document.querySelector(".s-header__nav a[href*=" + sectionId + "]").parentNode.classList.remove("current");
+                }
+            });
+        }
+
+    }; // end ssScrollSpy
+
+
+   /* Swiper
     * ------------------------------------------------------ */ 
     const ssSwiper = function() {
 
-        const homeSliderSwiper = new Swiper('.home-slider', {
+        const mySwiper = new Swiper('.swiper-container', {
 
             slidesPerView: 1,
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
-            },
+            },          
             breakpoints: {
-                // when window width is > 400px
+                // when window width is >= 401px
                 401: {
                     slidesPerView: 1,
                     spaceBetween: 20
                 },
-                // when window width is > 800px
+                // when window width is >= 801px
                 801: {
                     slidesPerView: 2,
-                    spaceBetween: 40
-                },
-                // when window width is > 1330px
-                1331: {
-                    slidesPerView: 3,
-                    spaceBetween: 48
-                },
-                // when window width is > 1773px
-                1774: {
-                    slidesPerView: 4,
                     spaceBetween: 48
                 }
             }
-        });
-
-        const pageSliderSwiper = new Swiper('.page-slider', {
-
-            slidesPerView: 1,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },
-            breakpoints: {
-                // when window width is > 400px
-                401: {
-                    slidesPerView: 1,
-                    spaceBetween: 20
-                },
-                // when window width is > 800px
-                801: {
-                    slidesPerView: 2,
-                    spaceBetween: 40
-                },
-                // when window width is > 1240px
-                1241: {
-                    slidesPerView: 3,
-                    spaceBetween: 48
-                }
-            }
-        });
+         });
 
     }; // end ssSwiper
 
 
-   /* mailchimp form
-    * ---------------------------------------------------- */ 
-    const ssMailChimpForm = function() {
+   /* Lightbox
+    * ------------------------------------------------------ */
+    const ssLightbox = function() {
 
-        const mcForm = document.querySelector('#mc-form');
+        const folioLinks = document.querySelectorAll('.folio-item a');
+        const modals = [];
 
-        if (!mcForm) return;
+        folioLinks.forEach(function(link) {
+            let modalbox = link.getAttribute('href');
+            let instance = basicLightbox.create(
+                document.querySelector(modalbox),
+                {
+                    onShow: function(instance) {
+                        //detect Escape key press
+                        document.addEventListener("keydown", function(evt) {
+                            evt = evt || window.event;
+                            if(evt.keyCode === 27){
+                            instance.close();
+                            }
+                        });
+                    }
+                }
+            )
+            modals.push(instance);
+        });
 
-        // Add novalidate attribute
-        mcForm.setAttribute('novalidate', true);
+        folioLinks.forEach(function(link, index) {
+            link.addEventListener("click", function(e) {
+                e.preventDefault();
+                modals[index].show();
+            });
+        });
 
-        // Field validation
-        function hasError(field) {
-
-            // Don't validate submits, buttons, file and reset inputs, and disabled fields
-            if (field.disabled || field.type === 'file' || field.type === 'reset' || field.type === 'submit' || field.type === 'button') return;
-
-            // Get validity
-            let validity = field.validity;
-
-            // If valid, return null
-            if (validity.valid) return;
-
-            // If field is required and empty
-            if (validity.valueMissing) return 'Please enter an email address.';
-
-            // If not the right type
-            if (validity.typeMismatch) {
-                if (field.type === 'email') return 'Please enter a valid email address.';
-            }
-
-            // If pattern doesn't match
-            if (validity.patternMismatch) {
-
-                // If pattern info is included, return custom error
-                if (field.hasAttribute('title')) return field.getAttribute('title');
-
-                // Otherwise, generic error
-                return 'Please match the requested format.';
-            }
-
-            // If all else fails, return a generic catchall error
-            return 'The value you entered for this field is invalid.';
-
-        };
-
-        // Show error message
-        function showError(field, error) {
-
-            // Get field id or name
-            let id = field.id || field.name;
-            if (!id) return;
-
-            let errorMessage = field.form.querySelector('.mc-status');
-
-            // Update error message
-            errorMessage.classList.remove('success-message');
-            errorMessage.classList.add('error-message');
-            errorMessage.innerHTML = error;
-
-        };
-
-        // Display form status (callback function for JSONP)
-        window.displayMailChimpStatus = function (data) {
-
-            // Make sure the data is in the right format and that there's a status container
-            if (!data.result || !data.msg || !mcStatus ) return;
-
-            // Update our status message
-            mcStatus.innerHTML = data.msg;
-
-            // If error, add error class
-            if (data.result === 'error') {
-                mcStatus.classList.remove('success-message');
-                mcStatus.classList.add('error-message');
-                return;
-            }
-
-            // Otherwise, add success class
-            mcStatus.classList.remove('error-message');
-            mcStatus.classList.add('success-message');
-        };
-
-        // Submit the form 
-        function submitMailChimpForm(form) {
-
-            let url = cfg.mailChimpURL;
-            let emailField = form.querySelector('#mce-EMAIL');
-            let serialize = '&' + encodeURIComponent(emailField.name) + '=' + encodeURIComponent(emailField.value);
-
-            if (url == '') return;
-
-            url = url.replace('/post?u=', '/post-json?u=');
-            url += serialize + '&c=displayMailChimpStatus';
-
-            // Create script with url and callback (if specified)
-            var ref = window.document.getElementsByTagName( 'script' )[ 0 ];
-            var script = window.document.createElement( 'script' );
-            script.src = url;
-
-            // Create global variable for the status container
-            window.mcStatus = form.querySelector('.mc-status');
-            window.mcStatus.classList.remove('error-message', 'success-message')
-            window.mcStatus.innerText = 'Submitting...';
-
-            // Insert script tag into the DOM
-            ref.parentNode.insertBefore( script, ref );
-
-            // After the script is loaded (and executed), remove it
-            script.onload = function () {
-                this.remove();
-            };
-
-        };
-
-        // Check email field on submit
-        mcForm.addEventListener('submit', function (event) {
-
-            event.preventDefault();
-
-            let emailField = event.target.querySelector('#mce-EMAIL');
-            let error = hasError(emailField);
-
-            if (error) {
-                showError(emailField, error);
-                emailField.focus();
-                return;
-            }
-
-            submitMailChimpForm(this);
-
-        }, false);
-
-    }; // end ssMailChimpForm
+    };  // end ssLightbox
 
 
-   /* alert boxes
+   /* Alert boxes
     * ------------------------------------------------------ */
     const ssAlertBoxes = function() {
 
         const boxes = document.querySelectorAll('.alert-box');
   
-        boxes.forEach(function(box){
+        boxes.forEach(function(box) {
 
-            box.addEventListener('click', function(e) {
-                if (e.target.matches('.alert-box__close')) {
+            box.addEventListener('click', function(e){
+                if (e.target.matches(".alert-box__close")) {
                     e.stopPropagation();
-                    e.target.parentElement.classList.add('hideit');
+                    e.target.parentElement.classList.add("hideit");
 
                     setTimeout(function() {
-                        box.style.display = 'none';
+                        box.style.display = "none";
                     }, 500)
-                }
+                }    
             });
+
         })
 
     }; // end ssAlertBoxes
 
 
-    /* Back to Top
+   /* Smoothscroll
+    * ------------------------------------------------------ */
+    const ssSmoothScroll = function () {
+        
+        const triggers = document.querySelectorAll(".smoothscroll");
+
+        triggers.forEach(function(trigger) {
+            trigger.addEventListener("click", function() {
+                const target = trigger.getAttribute("href");
+
+                Jump(target, {
+                    duration: 1200,
+                });
+            });
+        });
+
+    }; // end ssSmoothScroll
+
+
+   /* back to top
     * ------------------------------------------------------ */
     const ssBackToTop = function() {
 
@@ -327,59 +296,21 @@
     }; // end ssBackToTop
 
 
-   /* smoothscroll
-    * ------------------------------------------------------ */
-    const ssMoveTo = function() {
 
-        const easeFunctions = {
-            easeInQuad: function (t, b, c, d) {
-                t /= d;
-                return c * t * t + b;
-            },
-            easeOutQuad: function (t, b, c, d) {
-                t /= d;
-                return -c * t* (t - 2) + b;
-            },
-            easeInOutQuad: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t + b;
-                t--;
-                return -c/2 * (t*(t-2) - 1) + b;
-            },
-            easeInOutCubic: function (t, b, c, d) {
-                t /= d/2;
-                if (t < 1) return c/2*t*t*t + b;
-                t -= 2;
-                return c/2*(t*t*t + 2) + b;
-            }
-        }
-
-        const triggers = document.querySelectorAll('.smoothscroll');
-        
-        const moveTo = new MoveTo({
-            tolerance: 0,
-            duration: 1200,
-            easing: 'easeInOutCubic',
-            container: window
-        }, easeFunctions);
-
-        triggers.forEach(function(trigger) {
-            moveTo.registerTrigger(trigger);
-        });
-
-    }; // end ssMoveTo
-
-
-   /* Initialize
+   /* initialize
     * ------------------------------------------------------ */
     (function ssInit() {
 
         ssPreloader();
+        ssParallax();
+        ssMoveHeader();
         ssMobileMenu();
+        ssScrollSpy();
         ssSwiper();
-        ssMailChimpForm();
+        ssLightbox();
         ssAlertBoxes();
-        ssMoveTo();
+        ssSmoothScroll();
+        ssBackToTop();
 
     })();
 

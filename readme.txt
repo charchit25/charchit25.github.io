@@ -2,11 +2,10 @@
 
 DESCRIPTION:
 
-MONICA is a carefully crafted and modern HTML website template designed for freelancers, social 
-media managers, and marketing consultants who help businesses and companies improve their online 
-presence and establish long-lasting relationships with their communities. It is an excellent tool 
-for telling people about your skills and credentials, services, and other offerings, giving them 
-a better idea of who you are.
+CEEVEE is a clean, modern, fully responsive site template designed for online resume and portfolio. 
+With this template, you can easily introduce yourself and showcase your works to future clients 
+and employers. Also, it is flexible and easy to customize so you even use this template as 
+a creative, business or portfolio site for your company.
 
 ==================================================================================================
 
@@ -70,7 +69,7 @@ Also, keep your Paypal receipt as proof of payment and your good to go.
 
 SUPPORT:
     
-Since MONICA is distributed for free, support is not offered. MONICA is coded according 
+Since CEEVEE is distributed for free, support is not offered. CEEVEE is coded according 
 to current web standards and we did our best to make the template easy to use and modify.
 If you have minimum web development experience, you can easily modify the template. 
 However, If you're still new to HTML and CSS, I suggest that you visit the 
@@ -90,29 +89,6 @@ javascript in your skill-set, you can also check out these tutorials:
 ------------------------------------------------------------------------------------------------------ 
 
 
-USING THE MAILCHIMP FORM:
-
-To use the mailchimp form you need a mailchimp url. To get the mailchimp url, login to 
-your mailchimp account, click the Audience menu and select signup forms. Then choose 
-embedded forms and select unstyled form. In the generated form code get the value of 
-the form ACTION attribute and use it as your mailchimp url. Open the main.js file located
-in the template's "js" folder and look for this line of code: 
-
-const cfg = {
-
-    // MailChimp URL
-    mailChimpURL : 'https://facebook.us1.list-manage.com/subscribe/post?u=1abf75f6981256963a47d197a&amp;id=37c6d8f4d6' 
-
-};
-
-
-Replace the value of mailChimpURL with your mailchimp url.
-
-
-
--------------------------------------------------------------------------------------------------------
-
-
 GET THE LATEST VERSION:
 
 We update our templates on a regular basis so to make sure that you have the latest version, 
@@ -128,24 +104,27 @@ SOURCES AND CREDITS:
 I've used the following resources as listed.
 
 Fonts:
- - DM Serif Display Font (https://fonts.google.com/specimen/DM+Serif+Display)
- - Roboto Flex Font (https://fonts.google.com/specimen/Roboto+Flex)
+ - Inter Font (https://fonts.google.com/specimen/Inter)
+ - IBM Plex Serif Font (https://fonts.google.com/specimen/IBM+Plex+Serif)
 
 Icons:
  - Boxicons (https://boxicons.com/)
- - Atomicons (https://atomicons.com/)
+ - FontAwesome (https://fontawesome.com/)
 
 Stock Photos and Graphics:
  - Unsplash.com (https://unsplash.com/)
  
 Javascript Files:
- - MoveTo.js (https://github.com/hsnaydd/moveTo)
+ - Rellax.js (https://dixonandmoe.com/rellax/)
+ - Swiper (https://swiperjs.com/)
+ - Jump.js (https://github.com/callmecavs/jump.js)
  - Prism.js (https://prismjs.com/)
- - Swiper JS (https://swiperjs.com/)
+ - Basic Lightbox (https://basiclightbox.electerious.com/)
+ - MailtoUI (https://mailtoui.com/)
 
 -------------------------------------------------------------------------------------------------------
 
 
-Thanks for downloading from StyleShout :)
+Thanks for downloading from Styleshout :)
 
 
