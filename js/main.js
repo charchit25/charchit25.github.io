@@ -1,317 +1,270 @@
-/* ===================================================================
- * Ceevee 2.0.0 - Main JS
- *
- * ------------------------------------------------------------------- */
+/*---------------------------------------------------------------------------------
+/*
+/* Main JS
+/*
+-----------------------------------------------------------------------------------*/  
 
-(function(html) {
+(function($) {
 
-    "use strict";
-    
-    html.className = html.className.replace(/\bno-js\b/g, '') + ' js ';
+	"use strict";
 
+	/*---------------------------------------------------- */
+	/* Preloader
+	------------------------------------------------------ */ 
+   $(window).load(function() {
 
-   /* Preloader
-    * -------------------------------------------------- */
-    const ssPreloader = function() {
+      // will first fade out the loading animation 
+    	$("#loader").fadeOut("slow", function(){
 
-        const preloader = document.querySelector('#preloader');
-        if (!preloader) return;
+        // will fade out the whole DIV that covers the website.
+        $("#preloader").delay(300).fadeOut("slow");
 
-        window.addEventListener('load', function() {
-            
-            document.querySelector('body').classList.remove('ss-preload');
-            document.querySelector('body').classList.add('ss-loaded');
+      });       
 
-            preloader.addEventListener('transitionend', function(e) {
-                if (e.target.matches("#preloader")) {
-                    this.style.display = 'none';
-                }
-            });
-
-        });
-
-        // force page scroll position to top at page refresh
-        // window.addEventListener('beforeunload' , function () {
-        //     window.scrollTo(0, 0);
-        // });
-
-    }; // end ssPreloader
+  	})
 
 
-   /* Parallax
-    * -------------------------------------------------- */
-    const ssParallax = function() { 
+  	/*----------------------------------------------------*/
+  	/* Flexslider
+  	/*----------------------------------------------------*/
+  	$(window).load(function() {
 
-        const rellax = new Rellax('.rellax');
+	  	$('#hero-slider').flexslider({
+	   	namespace: "flex-",
+	      controlsContainer: ".hero-container",
+	      animation: 'fade',
+	      controlNav: true,
+	      directionNav: false,
+	      smoothHeight: true,
+	      slideshowSpeed: 7000,
+	      animationSpeed: 600,
+	      randomize: false,
+	      before: function(slider){
+			   $(slider).find(".animated").each(function(){
+			   	$(this).removeAttr("class");
+			  	});			  	
+			},
+			start: function(slider){
+			   $(slider).find(".flex-active-slide")
+			           	.find("h1").addClass("animated fadeInDown show")
+			           	.next().addClass("animated fadeInUp show");
+			           		
+			   $(window).trigger('resize');		  			 
+			},
+			after: function(slider){
+			 	$(slider).find(".flex-active-slide")
+			           	.find("h1").addClass("animated fadeInDown show")
+			           	.next().addClass("animated fadeInUp show");			  
+			}
+	   });
 
-    }; // end ssParallax
+	   $('#testimonial-slider').flexslider({
+	   	namespace: "flex-",
+	      controlsContainer: "",
+	      animation: 'slide',
+	      controlNav: true,
+	      directionNav: false,
+	      smoothHeight: true,
+	      slideshowSpeed: 7000,
+	      animationSpeed: 600,
+	      randomize: false,
+	   });
 
-
-   /* Move header menu
-    * -------------------------------------------------- */
-    const ssMoveHeader = function () {
-
-        const hdr = document.querySelector('.s-header');
-        const hero = document.querySelector('#hero');
-        let triggerHeight;
-
-        if (!(hdr && hero)) return;
-
-        setTimeout(function(){
-            triggerHeight = hero.offsetHeight - 170;
-        }, 300);
-
-        window.addEventListener('scroll', function () {
-
-            let loc = window.scrollY;
-           
-
-            if (loc > triggerHeight) {
-                hdr.classList.add('sticky');
-            } else {
-                hdr.classList.remove('sticky');
-            }
-
-            if (loc > triggerHeight + 20) {
-                hdr.classList.add('offset');
-            } else {
-                hdr.classList.remove('offset');
-            }
-
-            if (loc > triggerHeight + 150) {
-                hdr.classList.add('scrolling');
-            } else {
-                hdr.classList.remove('scrolling');
-            }
-
-        });
-
-    }; // end ssMoveHeader
+   });
 
 
-   /* Mobile Menu
-    * ---------------------------------------------------- */ 
-    const ssMobileMenu = function() {
+   /*----------------------------------------------------*/
+	/* Adjust Primary Navigation Background Opacity
+	------------------------------------------------------*/
+   $(window).on('scroll', function() {
 
-        const toggleButton = document.querySelector('.s-header__menu-toggle');
-        const headerNavWrap = document.querySelector('.s-header__nav-wrap');
-        const siteBody = document.querySelector("body");
+		var h = $('header').height();
+		var y = $(window).scrollTop();
+      var header = $('#main-header');
 
-        if (!(toggleButton && headerNavWrap)) return;
+	   if ((y > h + 30 ) && ($(window).outerWidth() > 768 ) ) {
+	      header.addClass('opaque');	      
+	   }
+      else {
+         if (y < h + 30) {
+            header.removeClass('opaque');
+         }
+         else {
+            header.addClass('opaque');
+         }
+      }
 
-        toggleButton.addEventListener('click', function(event){
-            event.preventDefault();
-            toggleButton.classList.toggle('is-clicked');
-            siteBody.classList.toggle('menu-is-open');
-        });
-
-        headerNavWrap.querySelectorAll('.s-header__nav a').forEach(function(link) {
-            link.addEventListener("click", function(evt) {
-
-                // at 800px and below
-                if (window.matchMedia('(max-width: 800px)').matches) {
-                    toggleButton.classList.toggle('is-clicked');
-                    siteBody.classList.toggle('menu-is-open');
-                }
-            });
-        });
-
-        window.addEventListener('resize', function() {
-
-            // above 800px
-            if (window.matchMedia('(min-width: 801px)').matches) {
-                if (siteBody.classList.contains('menu-is-open')) siteBody.classList.remove('menu-is-open');
-                if (toggleButton.classList.contains("is-clicked")) toggleButton.classList.remove("is-clicked");
-            }
-        });
-
-    }; // end ssMobileMenu
+	});
 
 
-   /* Highlight active menu link on pagescroll
-    * ------------------------------------------------------ */
-    const ssScrollSpy = function() {
+   /*----------------------------------------------------*/
+  	/* Highlight the current section in the navigation bar
+  	------------------------------------------------------*/
+	var sections = $("section"),
+	navigation_links = $("#nav-wrap a");	
 
-        const sections = document.querySelectorAll(".target-section");
+	sections.waypoint( {
 
-        // Add an event listener listening for scroll
-        window.addEventListener("scroll", navHighlight);
+       handler: function(direction) {
 
-        function navHighlight() {
-        
-            // Get current scroll position
-            let scrollY = window.pageYOffset;
-        
-            // Loop through sections to get height(including padding and border), 
-            // top and ID values for each
-            sections.forEach(function(current) {
-                const sectionHeight = current.offsetHeight;
-                const sectionTop = current.offsetTop - 50;
-                const sectionId = current.getAttribute("id");
-            
-               /* If our current scroll position enters the space where current section 
-                * on screen is, add .current class to parent element(li) of the thecorresponding 
-                * navigation link, else remove it. To know which link is active, we use 
-                * sectionId variable we are getting while looping through sections as 
-                * an selector
-                */
-                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                    document.querySelector(".s-header__nav a[href*=" + sectionId + "]").parentNode.classList.add("current");
-                } else {
-                    document.querySelector(".s-header__nav a[href*=" + sectionId + "]").parentNode.classList.remove("current");
-                }
-            });
-        }
+		   var active_section;
 
-    }; // end ssScrollSpy
+			active_section = $('section#' + this.element.id);
+
+			if (direction === "up") active_section = active_section.prev();
+
+			var active_link = $('#nav-wrap a[href="#' + active_section.attr("id") + '"]');			
+
+         navigation_links.parent().removeClass("current");
+			active_link.parent().addClass("current");
+
+		}, 
+
+		offset: '25%'
+
+	});
 
 
-   /* Swiper
-    * ------------------------------------------------------ */ 
-    const ssSwiper = function() {
+   /*----------------------------------------------------*/
+  	/* FitText Settings
+  	------------------------------------------------------ */
+  	setTimeout(function() {
 
-        const mySwiper = new Swiper('.swiper-container', {
+   	$('#hero-slider h1').fitText(1, { minFontSize: '30px', maxFontSize: '49px' });
 
-            slidesPerView: 1,
-            pagination: {
-                el: '.swiper-pagination',
-                clickable: true,
-            },          
-            breakpoints: {
-                // when window width is >= 401px
-                401: {
-                    slidesPerView: 1,
-                    spaceBetween: 20
-                },
-                // when window width is >= 801px
-                801: {
-                    slidesPerView: 2,
-                    spaceBetween: 48
-                }
-            }
-         });
-
-    }; // end ssSwiper
+  	}, 100);
 
 
-   /* Lightbox
-    * ------------------------------------------------------ */
-    const ssLightbox = function() {
+  	/*-----------------------------------------------------*/
+  	/* Mobile Menu
+   ------------------------------------------------------ */  
+   var menu_icon = $("<span class='menu-icon'>Menu</span>");
+  	var toggle_button = $("<a>", {                         
+                        id: "toggle-btn", 
+                        html : "",
+                        title: "Menu",
+                        href : "#" } 
+                        );
+  	var nav_wrap = $('nav#nav-wrap')
+  	var nav = $("ul#nav");  
+   
+   /* if JS is enabled, remove the two a.mobile-btns 
+  	and dynamically prepend a.toggle-btn to #nav-wrap */
+  	nav_wrap.find('a.mobile-btn').remove(); 
+  	toggle_button.append(menu_icon); 
+   nav_wrap.prepend(toggle_button); 
 
-        const folioLinks = document.querySelectorAll('.folio-item a');
-        const modals = [];
+  	toggle_button.on("click", function(e) {
+   	e.preventDefault();
+    	nav.slideToggle("fast");     
+  	});
 
-        folioLinks.forEach(function(link) {
-            let modalbox = link.getAttribute('href');
-            let instance = basicLightbox.create(
-                document.querySelector(modalbox),
-                {
-                    onShow: function(instance) {
-                        //detect Escape key press
-                        document.addEventListener("keydown", function(evt) {
-                            evt = evt || window.event;
-                            if(evt.keyCode === 27){
-                            instance.close();
-                            }
-                        });
-                    }
-                }
-            )
-            modals.push(instance);
-        });
+  	if (toggle_button.is(':visible')) nav.addClass('mobile');
+  	$(window).resize(function() {
+   	if (toggle_button.is(':visible')) nav.addClass('mobile');
+    	else nav.removeClass('mobile');
+  	});
 
-        folioLinks.forEach(function(link, index) {
-            link.addEventListener("click", function(e) {
-                e.preventDefault();
-                modals[index].show();
-            });
-        });
-
-    };  // end ssLightbox
+  	$('ul#nav li a').on("click", function() {      
+   	if (nav.hasClass('mobile')) nav.fadeOut('fast');      
+  	});
 
 
-   /* Alert boxes
-    * ------------------------------------------------------ */
-    const ssAlertBoxes = function() {
+  	/*----------------------------------------------------*/
+  	/* Smooth Scrolling
+  	------------------------------------------------------ */
+  	$('.smoothscroll').on('click', function (e) {
+	 	
+	 	e.preventDefault();
 
-        const boxes = document.querySelectorAll('.alert-box');
+   	var target = this.hash,
+    	$target = $(target);
+
+    	$('html, body').stop().animate({
+       	'scrollTop': $target.offset().top
+      }, 800, 'swing', function () {
+      	window.location.hash = target;
+      });
+
+  	});  
   
-        boxes.forEach(function(box) {
 
-            box.addEventListener('click', function(e){
-                if (e.target.matches(".alert-box__close")) {
-                    e.stopPropagation();
-                    e.target.parentElement.classList.add("hideit");
+   /*----------------------------------------------------*/
+	/*	Modal Popup
+	------------------------------------------------------*/
+    $('.item-wrap a').magnificPopup({
 
-                    setTimeout(function() {
-                        box.style.display = "none";
-                    }, 500)
-                }    
-            });
+       type:'inline',
+       fixedContentPos: false,
+       removalDelay: 300,
+       showCloseBtn: false,
+       mainClass: 'mfp-fade'
 
-        })
+    });
 
-    }; // end ssAlertBoxes
-
-
-   /* Smoothscroll
-    * ------------------------------------------------------ */
-    const ssSmoothScroll = function () {
-        
-        const triggers = document.querySelectorAll(".smoothscroll");
-
-        triggers.forEach(function(trigger) {
-            trigger.addEventListener("click", function() {
-                const target = trigger.getAttribute("href");
-
-                Jump(target, {
-                    duration: 1200,
-                });
-            });
-        });
-
-    }; // end ssSmoothScroll
+    $(document).on('click', '.popup-modal-dismiss', function (e) {
+    		e.preventDefault();
+    		$.magnificPopup.close();
+    });
 
 
-   /* back to top
-    * ------------------------------------------------------ */
-    const ssBackToTop = function() {
+   /*----------------------------------------------------*/
+	/*  Placeholder Plugin Settings
+	------------------------------------------------------ */  	 
+	$('input, textarea').placeholder()  
 
-        const pxShow = 900;
-        const goTopButton = document.querySelector(".ss-go-top");
+   
+	/*----------------------------------------------------*/
+	/*	contact form
+	------------------------------------------------------*/
 
-        if (!goTopButton) return;
+	/* local validation */
+	$('#contactForm').validate({
 
-        // Show or hide the button
-        if (window.scrollY >= pxShow) goTopButton.classList.add("link-is-visible");
+		/* submit via ajax */
+		submitHandler: function(form) {
 
-        window.addEventListener('scroll', function() {
-            if (window.scrollY >= pxShow) {
-                if(!goTopButton.classList.contains('link-is-visible')) goTopButton.classList.add("link-is-visible")
-            } else {
-                goTopButton.classList.remove("link-is-visible")
-            }
-        });
+			var sLoader = $('#submit-loader');
 
-    }; // end ssBackToTop
+			$.ajax({      	
 
+		      type: "POST",
+		      url: "inc/sendEmail.php",
+		      data: $(form).serialize(),
+		      beforeSend: function() { 
 
+		      	sLoader.fadeIn(); 
 
-   /* initialize
-    * ------------------------------------------------------ */
-    (function ssInit() {
+		      },
+		      success: function(msg) {
 
-        ssPreloader();
-        ssParallax();
-        ssMoveHeader();
-        ssMobileMenu();
-        ssScrollSpy();
-        ssSwiper();
-        ssLightbox();
-        ssAlertBoxes();
-        ssSmoothScroll();
-        ssBackToTop();
+	            // Message was sent
+	            if (msg == 'OK') {
+	            	sLoader.fadeOut(); 
+	               $('#message-warning').hide();
+	               $('#contactForm').fadeOut();
+	               $('#message-success').fadeIn();   
+	            }
+	            // There was an error
+	            else {
+	            	sLoader.fadeOut(); 
+	               $('#message-warning').html(msg);
+		            $('#message-warning').fadeIn();
+	            }
 
-    })();
+		      },
+		      error: function() {
 
-})(document.documentElement);
+		      	sLoader.fadeOut(); 
+		      	$('#message-warning').html("Something went wrong. Please try again.");
+		         $('#message-warning').fadeIn();
+
+		      }
+
+	      });     		
+  		}
+
+	});
+	
+
+})(jQuery);
